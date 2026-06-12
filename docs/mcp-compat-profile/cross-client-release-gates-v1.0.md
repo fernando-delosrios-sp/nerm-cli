@@ -7,7 +7,7 @@ Purpose: Add release-gate verification beyond unit tests.
 
 Validate interoperability across:
 - MCP server (`tool-nerm-mcp-server`)
-- Remote/orchestrator agent (`testAgent`)
+- Remote/orchestrator agent (`nermTestAgent`)
 - UI consumer (`ChatClient`)
 
 ## Mandatory Release Gates

@@ -2,7 +2,7 @@
 
 This folder contains the shared compatibility contract for:
 - `tool-nerm-mcp-server` (MCP server)
-- `testAgent` (remote/orchestrator agent)
+- `nermTestAgent` (remote/orchestrator agent)
 - `ChatClient` (UI client)
 
 ## File Ownership
@@ -13,19 +13,19 @@ This folder contains the shared compatibility contract for:
 
 - `tool-response-contract-v1.0.md`  
   - Primary owner: MCP Server team (`tool-nerm-mcp-server`)
-  - Secondary reviewers: `testAgent` + `ChatClient`
+  - Secondary reviewers: `nermTestAgent` + `ChatClient`
 
 - `streamable-http-transport-profile-v1.0.md`  
   - Primary owner: MCP Server team
-  - Secondary reviewers: `testAgent` transport/client owners
+  - Secondary reviewers: `nermTestAgent` transport/client owners
 
 - `multimodal-compat-guidance-v1.0.md`  
   - Primary owners: MCP Server + ChatClient teams
-  - Secondary reviewers: `testAgent`
+  - Secondary reviewers: `nermTestAgent`
 
 - `production-logging-profile-v1.0.md`  
   - Primary owner: MCP Server/Platform Ops
-  - Secondary reviewers: Security/Compliance + `testAgent`
+  - Secondary reviewers: Security/Compliance + `nermTestAgent`
 
 - `cross-client-release-gates-v1.0.md`  
   - Primary owner: QA/Release Engineering
