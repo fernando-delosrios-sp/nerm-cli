@@ -1,0 +1,35 @@
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+
+# Python cache/bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build/package artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Local runtime artifacts
+.nerm_charts/
+
+# Test/eval outputs
+nerm-mcp-server/tests/evals/traces/*
+!nerm-mcp-server/tests/evals/traces/.gitkeep

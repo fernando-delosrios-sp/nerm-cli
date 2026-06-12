@@ -1,0 +1,5 @@
+{
+  "items": [
+    { "id": "attr-1", "name": "Start Date", "data_type": "date" }
+  ]
+}

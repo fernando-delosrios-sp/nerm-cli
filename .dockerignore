@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+nerm-mcp-server/.pytest_cache
+nerm-mcp-server/tests
+nerm-mcp-server/.env
+nerm-mcp-server/.env.*
+docs
