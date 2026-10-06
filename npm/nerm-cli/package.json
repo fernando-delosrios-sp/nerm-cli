@@ -1,6 +1,6 @@
 {
   "name": "nerm-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI for SailPoint NERM tenant APIs",
   "bin": {
     "nerm": "bin/nerm.js"
@@ -13,11 +13,11 @@
     "node": ">=18"
   },
   "optionalDependencies": {
-    "@nerm-cli/darwin-arm64": "0.1.0",
-    "@nerm-cli/darwin-x64": "0.1.0",
-    "@nerm-cli/linux-arm64": "0.1.0",
-    "@nerm-cli/linux-x64": "0.1.0",
-    "@nerm-cli/win32-arm64": "0.1.0",
-    "@nerm-cli/win32-x64": "0.1.0"
+    "@nerm-cli/darwin-arm64": "0.1.1",
+    "@nerm-cli/darwin-x64": "0.1.1",
+    "@nerm-cli/linux-arm64": "0.1.1",
+    "@nerm-cli/linux-x64": "0.1.1",
+    "@nerm-cli/win32-arm64": "0.1.1",
+    "@nerm-cli/win32-x64": "0.1.1"
   }
 }

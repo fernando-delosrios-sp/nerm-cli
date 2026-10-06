@@ -15,7 +15,7 @@ import (
 	"github.com/sailpoint-se/nerm-cli/internal/profiles"
 )
 
-var Version = "0.1.0"
+var Version = "0.1.1"
 
 type runtime struct {
 	profileName string
