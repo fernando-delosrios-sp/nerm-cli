@@ -10,41 +10,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      NERM_BASE_URL: https://tenant.example.com
-      NERM_BEARER_TOKEN: Bearer ci-token
-      NERM_API_BASE_PATH: /api
-      RUN_NETWORK_READINESS: "false"
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: |
-            nerm-mcp-server/pyproject.toml
-
-      - name: Install dependencies
+          go-version: "1.24.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Test
+        run: go test ./...
+      - name: Cross-compile npm binaries
+        run: make dist
+      - name: Smoke CLI help
         run: |
-          python -m venv .venv
-          . .venv/bin/activate
-          python -m pip install --upgrade pip
-          python -m pip install -e ./nerm-mcp-server[dev]
-
-      - name: Run phase 3 readiness gate
-        if: ${{ env.RUN_NETWORK_READINESS == 'true' }}
-        run: |
-          . .venv/bin/activate
-          make phase3-readiness
-
-      - name: Build container image
-        run: |
-          docker build -t nerm-agent:ci .
-
-      - name: Validate container health probe
-        run: |
-          docker run --rm nerm-agent:ci python -c "from nerm.health import get_health_report; import sys; report=get_health_report(); print(report); sys.exit(0 if report.get('status') == 'ok' else 1)"
+          node npm/nerm-cli/bin/nerm.js --help
+          node npm/nerm-cli/bin/nerm.js version
