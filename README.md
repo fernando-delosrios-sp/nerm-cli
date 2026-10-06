@@ -49,3 +49,21 @@ node npm/nerm-cli/bin/nerm.js --help
 ```
 
 `make dist` cross-compiles static binaries for darwin, linux, and windows (amd64 and arm64) into npm platform packages under `npm/packages/`.
+
+## Publish to npm
+
+Bump the version, rebuild, and publish the six platform packages plus `nerm-cli`:
+
+```bash
+./scripts/publish-npm.sh 0.1.1
+```
+
+Also commit, tag, and push:
+
+```bash
+./scripts/publish-npm.sh 0.1.1 --git
+# or
+make publish VERSION=0.1.1 GIT=--git
+```
+
+`--dry-run` bumps and builds without publishing.
