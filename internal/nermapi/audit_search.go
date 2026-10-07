@@ -172,16 +172,20 @@ func RunAdvancedSearch(c *client.Client, payload map[string]any) (map[string]any
 	return asMap, nil
 }
 
-func SubmitWorkflow(c *client.Client, payload map[string]any) (map[string]any, error) {
+func SubmitWorkflow(c *client.Client, payload map[string]any, run *bool) (map[string]any, error) {
 	workflowID, _ := payload["workflow_id"].(string)
 	if strings.TrimSpace(workflowID) == "" {
 		return map[string]any{
-			"error":   "nerm_api_error",
-			"status":  400,
-			"body":    "workflow_id is required",
+			"error":  "nerm_api_error",
+			"status": 400,
+			"body":   "workflow_id is required",
 		}, nil
 	}
-	result, err := c.Request("POST", client.WorkflowSessions, nil, payload, 30*time.Second)
+	query := map[string]any{}
+	if run != nil {
+		query["run"] = *run
+	}
+	result, err := c.Request("POST", client.WorkflowSessions, query, payload, 30*time.Second)
 	if err != nil {
 		return nil, err
 	}

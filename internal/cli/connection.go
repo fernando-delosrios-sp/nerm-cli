@@ -160,22 +160,6 @@ func listProfileTypes(rt *runtime, cmd *cobra.Command) (map[string]any, error) {
 	return nermapi.SliceCatalog(filtered, limit, offset, boolPtr(cmd, "metadata")), nil
 }
 
-func getProfileType(rt *runtime, id string) (map[string]any, error) {
-	c, _, err := rt.client()
-	if err != nil {
-		return nil, err
-	}
-	catalog, err := nermapi.FetchCatalog(c, client.ProfileTypes, "profile_types")
-	if err != nil {
-		return nil, err
-	}
-	item, err := nermapi.FindByID(catalog, id)
-	if err != nil {
-		return nermapi.AsErrorJSON(err), nil
-	}
-	return item, nil
-}
-
 func fmtString(v any) string {
 	if v == nil {
 		return ""

@@ -55,6 +55,7 @@ func newProfilesCmd(rt *runtime) *cobra.Command {
 	list.Flags().String("after-id", "", "filter after profile id")
 	list.Flags().String("updated-after", "", "filter by updated_after")
 	list.Flags().Bool("exclude-attributes", false, "exclude attributes")
+	attachProfileWrites(cmd, rt)
 	return cmd
 }
 
@@ -84,6 +85,7 @@ func newUsersCmd(rt *runtime) *cobra.Command {
 	list.Flags().String("type", "", "NeprofileUser or NeaccessUser")
 	list.Flags().String("email", "", "filter by email")
 	list.Flags().String("sailpoint-identity-id", "", "filter by ISC identity id")
+	attachUserWrites(cmd, rt)
 	return cmd
 }
 
@@ -113,6 +115,7 @@ func newUserRolesCmd(rt *runtime) *cobra.Command {
 	list.Flags().String("role-id", "", "filter by role id")
 	list.Flags().Bool("include-user-details", true, "enrich user fields")
 	list.Flags().Bool("include-role-details", true, "enrich role fields")
+	attachUserRoleWrites(cmd, rt)
 	return cmd
 }
 
@@ -125,16 +128,17 @@ func newUserManagersCmd(rt *runtime) *cobra.Command {
 	list := cmd.Commands()[0]
 	list.Flags().String("user-id", "", "filter by user id")
 	list.Flags().String("manager-id", "", "filter by manager id")
+	attachUserManagerWrites(cmd, rt)
 	return cmd
 }
 
 func newUserProfilesCmd(rt *runtime) *cobra.Command {
 	cmd := newResourceListGet(rt, "user-profiles", "User-to-profile relationship mappings", func(rt *runtime, cmd *cobra.Command) (map[string]any, error) {
 		return listPath(rt, cmd, client.UserProfiles, "user_profiles", "", queryFrom(cmd, "order", "user-id", "ne-attribute-id", "profile-id", "relationship-type"), map[string]string{
-			"user-id":            "user_id",
-			"ne-attribute-id":    "ne_attribute_id",
-			"profile-id":         "profile_id",
-			"relationship-type":  "relationship_type",
+			"user-id":           "user_id",
+			"ne-attribute-id":   "ne_attribute_id",
+			"profile-id":        "profile_id",
+			"relationship-type": "relationship_type",
 		})
 	}, func(rt *runtime, id string) (map[string]any, error) {
 		return getPath(rt, client.UserProfiles, id)
@@ -144,6 +148,7 @@ func newUserProfilesCmd(rt *runtime) *cobra.Command {
 	list.Flags().String("profile-id", "", "filter by profile id")
 	list.Flags().String("ne-attribute-id", "", "filter by relationship attribute id")
 	list.Flags().String("relationship-type", "", "owner or contributor")
+	attachUserProfileWrites(cmd, rt)
 	return cmd
 }
 
@@ -154,6 +159,7 @@ func newRolesCmd(rt *runtime) *cobra.Command {
 		return getPath(rt, client.Roles, id)
 	}, "id")
 	cmd.Commands()[0].Flags().String("type", "", "NeprofileRole, NeaccessRole, or IdproxyRole")
+	attachRoleWrites(cmd, rt)
 	return cmd
 }
 
@@ -166,6 +172,7 @@ func newRoleProfilesCmd(rt *runtime) *cobra.Command {
 	list := cmd.Commands()[0]
 	list.Flags().String("role-id", "", "filter by role id")
 	list.Flags().String("profile-id", "", "filter by profile id")
+	attachRoleProfileWrites(cmd, rt)
 	return cmd
 }
 
@@ -176,8 +183,8 @@ func newIdentityProofingCmd(rt *runtime) *cobra.Command {
 		Short: "List identity proofing results",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			payload, err := listPath(rt, cmd, client.IdentityProofingResults, "identity_proofing_results", "", queryFrom(cmd, "order", "profile-id", "workflow-session-id", "result"), map[string]string{
-				"profile-id":           "profile_id",
-				"workflow-session-id":  "workflow_session_id",
+				"profile-id":          "profile_id",
+				"workflow-session-id": "workflow_session_id",
 			})
 			return handleAPI(rt, payload, err)
 		},
@@ -220,23 +227,12 @@ func newAttributesCmd(rt *runtime) *cobra.Command {
 		offset, _ := cmd.Flags().GetInt("offset")
 		return nermapi.SliceCatalog(filtered, limit, offset, boolPtr(cmd, "metadata")), nil
 	}, func(rt *runtime, id string) (map[string]any, error) {
-		c, _, err := rt.client()
-		if err != nil {
-			return nil, err
-		}
-		catalog, err := nermapi.FetchCatalog(c, client.Attributes, "ne_attributes")
-		if err != nil {
-			return nil, err
-		}
-		item, err := nermapi.FindByID(catalog, id)
-		if err != nil {
-			return nermapi.AsErrorJSON(err), nil
-		}
-		return item, nil
+		return getPath(rt, client.Attributes, id)
 	}, "id")
 	list := cmd.Commands()[0]
 	list.Flags().String("label", "", "filter by label or name")
 	list.Flags().String("data-type", "", "filter by data type")
+	attachAttributeWrites(cmd, rt)
 	return cmd
 }
 

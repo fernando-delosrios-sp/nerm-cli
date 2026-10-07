@@ -2,7 +2,7 @@
 name: nerm-cli
 description: >-
   Drive SailPoint NERM (Non-Employee Risk Management) tenant APIs with the nerm
-  CLI: saved connection profiles, profile/user/role/delegation/workflow/audit
+  CLI: saved connection profiles, profile/user/role/form/page/workflow/audit
   commands, and raw REST. Use when working with NERM, nonemployee.com, or NERM
   v1/v2025 APIs.
 ---

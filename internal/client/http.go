@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -57,13 +58,35 @@ func NormalizeBearer(token string) string {
 
 func (c *Client) Request(method, path string, query map[string]any, body any, timeout time.Duration) (any, error) {
 	var payload []byte
+	contentType := ""
 	if body != nil {
 		var err error
 		payload, err = json.Marshal(body)
 		if err != nil {
 			return nil, err
 		}
+		contentType = "application/json"
 	}
+	return c.request(method, path, query, contentType, payload, timeout)
+}
+
+func (c *Client) RequestFile(method, path string, query map[string]any, field, filename string, content []byte, timeout time.Duration) (any, error) {
+	var buf bytes.Buffer
+	writer := multipart.NewWriter(&buf)
+	part, err := writer.CreateFormFile(field, filename)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := part.Write(content); err != nil {
+		return nil, err
+	}
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+	return c.request(method, path, query, writer.FormDataContentType(), buf.Bytes(), timeout)
+}
+
+func (c *Client) request(method, path string, query map[string]any, contentType string, payload []byte, timeout time.Duration) (any, error) {
 	full := urlutil.JoinPath(c.BaseURL, path)
 	if encoded := encodeQuery(query); encoded != "" {
 		if strings.Contains(full, "?") {
@@ -85,8 +108,8 @@ func (c *Client) Request(method, path string, query map[string]any, body any, ti
 		}
 		req.Header.Set("Authorization", c.Token)
 		req.Header.Set("Accept", "application/json")
-		if payload != nil {
-			req.Header.Set("Content-Type", "application/json")
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
 		}
 		httpClient := c.HTTP
 		if timeout > 0 {

@@ -132,24 +132,11 @@ func newWorkflowsCmd(rt *runtime) *cobra.Command {
 
 	session := &cobra.Command{
 		Use:   "session ID",
-		Short: "Find one workflow session by id",
+		Short: "Get one workflow session",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c, _, err := rt.client()
-			if err != nil {
-				return writeJSON(rt, map[string]any{"error": "profile_error", "message": err.Error()})
-			}
-			payload, err := nermapi.List(c, client.WorkflowSessions, "workflow_sessions", nermapi.ListOptions{Limit: 200, ForceAll: true}, "")
-			if err != nil {
-				return handleAPI(rt, payload, err)
-			}
-			for _, item := range itemsAsMaps(payload["items"]) {
-				id := args[0]
-				if fmtString(item["id"]) == id || fmtString(item["workflow_session_id"]) == id || fmtString(item["workflow_session_full_id"]) == id {
-					return writeJSON(rt, item)
-				}
-			}
-			return writeJSON(rt, map[string]any{"error": "nerm_api_error", "status": 404, "body": "workflow session " + args[0] + " not found"})
+			payload, err := getPath(rt, client.WorkflowSessions, args[0])
+			return handleAPI(rt, payload, err)
 		},
 	}
 
@@ -187,12 +174,13 @@ func newWorkflowsCmd(rt *runtime) *cobra.Command {
 			if err != nil {
 				return writeJSON(rt, map[string]any{"error": "profile_error", "message": err.Error()})
 			}
-			payload, err := nermapi.SubmitWorkflow(c, body)
+			payload, err := nermapi.SubmitWorkflow(c, body, boolPtr(cmd, "run"))
 			return handleAPI(rt, payload, err)
 		},
 	}
 	submit.Flags().StringVar(&submitBody, "body", "", "JSON body")
 	submit.Flags().StringVar(&submitFile, "body-file", "", "JSON body file")
+	submit.Flags().Bool("run", false, "run the session after a successful create")
 
 	job := &cobra.Command{
 		Use:   "job ID",
@@ -217,6 +205,12 @@ func newWorkflowsCmd(rt *runtime) *cobra.Command {
 	}
 
 	cmd.AddCommand(sessions, session, statuses, submit, job)
+	addOps(cmd, rt, []op{
+		{Use: "update", Short: "Update a workflow session", Method: "PATCH", Path: "/workflow_sessions/%s", Args: []string{"ID"}, Body: true, Query: []flagSpec{{name: "run", api: "run", help: "run the session after a successful update", kind: "bool"}}},
+		{Use: "attachment", Short: "Get a workflow session attachment URL", Method: "GET", Path: "/workflow_sessions/%s/upload/%s", Args: []string{"ID", "ATTRIBUTE_ID"}},
+		{Use: "attachment-upload", Short: "Upload a workflow session attachment", Method: "POST", Path: "/workflow_sessions/%s/upload/%s", Args: []string{"ID", "ATTRIBUTE_ID"}, File: true},
+	})
+	addOps(cmd, rt, workflowTemplateOps())
 	return cmd
 }
 
@@ -287,6 +281,7 @@ func newSearchCmd(rt *runtime) *cobra.Command {
 	run.Flags().StringVar(&body, "body", "", "JSON body")
 	run.Flags().StringVar(&bodyFile, "body-file", "", "JSON body file")
 	cmd.AddCommand(run)
+	attachSearchOps(cmd, rt)
 	return cmd
 }
 
