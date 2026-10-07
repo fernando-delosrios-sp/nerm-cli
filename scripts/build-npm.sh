@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="${VERSION:-0.1.1}"
+VERSION="${VERSION:-0.1.2}"
 MODULE="github.com/sailpoint-se/nerm-cli/internal/cli.Version=${VERSION}"
 
 targets=(
