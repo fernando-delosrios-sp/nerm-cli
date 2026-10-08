@@ -15,7 +15,7 @@ import (
 	"github.com/sailpoint-se/nerm-cli/internal/profiles"
 )
 
-var Version = "0.1.2"
+var Version = "0.1.3"
 
 type runtime struct {
 	profileName string
@@ -33,7 +33,33 @@ func Run(args []string, stdout, stderr io.Writer, store *profiles.Store) error {
 	rt := &runtime{stdout: stdout, stderr: stderr, store: store}
 	cmd := newRoot(rt)
 	cmd.SetArgs(args)
-	return cmd.Execute()
+	ran, err := cmd.ExecuteC()
+	if err != nil && isUsageError(err) {
+		_ = ran.Help()
+	}
+	return err
+}
+
+func isUsageError(err error) bool {
+	msg := err.Error()
+	for _, snippet := range []string{
+		"accepts ",
+		"requires at least ",
+		"required flag",
+		"at least one of the flags",
+		"if any flags in the group",
+		"unknown flag",
+		"unknown shorthand flag",
+		"unknown command",
+		"invalid argument",
+		"flag needs an argument",
+		"bad flag syntax",
+	} {
+		if strings.Contains(msg, snippet) {
+			return true
+		}
+	}
+	return false
 }
 
 func newRoot(rt *runtime) *cobra.Command {
@@ -87,6 +113,7 @@ func newRoot(rt *runtime) *cobra.Command {
 		newAuditCmd(rt),
 		newSearchCmd(rt),
 		newAPICmd(rt),
+		newConfigCmd(rt),
 	)
 	cmd.SetOut(rt.stdout)
 	cmd.SetErr(rt.stderr)
